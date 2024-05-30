@@ -25,3 +25,5 @@ Started it on 30/05/2024.
     So, each part has its own directory, which contains a directory for each exercise set (like the unicafe exercises in part 1).
 
     The exercises are submitted one part at a time. When you have submitted the exercises for a part, you can no longer submit any missed exercises for that part.
+
+    
