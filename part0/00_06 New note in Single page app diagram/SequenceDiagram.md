@@ -9,5 +9,12 @@ This was the last exercise, and it's time to push your answers to GitHub and mar
 ## Solution Proposed
 
 ```mermaid
+graph TD;
+    Question-->Q5;
+    Question-->Q6;
 
+    Q5-->Result?;
+    Q6-->Result?;
 ```
+
+Is it the same exercise?
