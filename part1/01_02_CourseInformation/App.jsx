@@ -1,8 +1,3 @@
-/*
-    I did the second exercise directly at step 1. 
-    This is the App.jsx from the exercise one
-*/
-
 const Header = (props) => {
     return <h1>{props.course}</h1>
   }
