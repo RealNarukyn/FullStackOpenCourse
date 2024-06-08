@@ -4,7 +4,14 @@ import { useState } from 'react'
 const MyButton = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
 // Component < StatisticLine >
-const StatisticLine = ({ text, data }) => <p>{text}: {data ? data : 0}</p>
+const StatisticLine = ({ text, data }) => {
+  return (
+    <tr>
+      <td><b>{text}:</b></td>
+      <td>{data ? data : 0}</td>
+    </tr>
+  )
+}
 
 // Component < Statistics >
 const Statistics = ({ stats }) => {
@@ -14,44 +21,41 @@ const Statistics = ({ stats }) => {
   const getStatRatio = stat => (stat / getAllStats()) * 100;
 
 
-  if (getAllStats() <= 0)
-  {
+  if (getAllStats() <= 0) {
     return (
       <div>
         <h2>Statistics:</h2>
         <p><b>Before looking at the statistics you gotta give feedback...</b></p>
       </div>
-      )
+    )
   }
 
   return (
     <div>
       <h2>Statistics:</h2>
-      <StatisticLine text={'Good'} data={stats.good} />
-      <StatisticLine text={'Neutral'} data={stats.neutral} />
-      <StatisticLine text={'Bad'} data={stats.bad} />
 
-      <hr />
+      <table>
+        <tbody>
+          <StatisticLine text={'Good'} data={stats.good} />
+          <StatisticLine text={'Neutral'} data={stats.neutral} />
+          <StatisticLine text={'Bad'} data={stats.bad} />
 
-      <StatisticLine text={'All Votes'} data={getAllStats()} />
-      <StatisticLine text={'Average'} data={getAverage()} />
-
-      <hr />
-
-      {getAllStats() > 0 ?
-        <StatisticLine text={'Positive Ratio'} data={getStatRatio(stats.good) + '%'} /> :
-        <StatisticLine text={'Positive Ratio'} data={'0%'} />
-      }
-
+          <StatisticLine text={'All Votes'} data={getAllStats()} />
+          <StatisticLine text={'Average'} data={getAverage()} />
+          {getAllStats() > 0 ?
+            <StatisticLine text={'Positive Ratio'} data={getStatRatio(stats.good) + '%'} /> :
+            <StatisticLine text={'Positive Ratio'} data={'0%'} />
+          }
+        </tbody>
+      </table>
     </div>
-    )
+  )
 }
 
 // Component < App >
 const App = () => {
   // save clicks of each button to its own state
   const [stats, setStats] = useState({ good: 0, neutral: 0, bad: 0 });
-  const [hasGivenFeedback, setHasGivenFeedback] = useState(false);
 
   // Handle OnClick Fncs
   const hOnClickGood = () => setStats({ ...stats, good: stats.good + 1 });
