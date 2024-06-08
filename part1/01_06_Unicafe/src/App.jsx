@@ -1,68 +1,71 @@
 import { useState } from 'react'
 
-const MyButton = ({ onClick, text }) => {
-  return <button onClick={onClick}>{text}</button>
-}
+// Component < MyButton >
+const MyButton = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-const StatisticLine = ({ text, data }) => <p>{text}: {data? data : 0}</p>
+// Component < StatisticLine >
+const StatisticLine = ({ text, data }) => <p>{text}: {data ? data : 0}</p>
 
-const Statistics = () => <div>ToDo...</div>
+// Component < Statistics >
+const Statistics = ({ stats }) => {
 
-const App = () => {
-  // save clicks of each button to its own state
-  const [good, setGood]         = useState(0);
-  const [neutral, setNeutral]   = useState(0);
-  const [bad, setBad]           = useState(0);
+  const getAllStats = () => stats.good + stats.neutral + stats.bad;
+  const getAverage = () => (stats.good - stats.bad) / getAllStats();
+  const getStatRatio = stat => (stat / getAllStats()) * 100;
 
-  const [allStats, setAllStats] = useState(0);
-  const [average, setAverage]   = useState(0);
 
-  const hOnClickGood = () => {
-    const uGood = good + 1;
-    
-    setGood(uGood);
-    setAllStats(uGood + neutral + bad);
-    
-    setAverage(average + 1);
+  if (getAllStats() <= 0)
+  {
+    return (
+      <div>
+        <h2>Statistics:</h2>
+        <p><b>Before looking at the statistics you gotta give feedback...</b></p>
+      </div>
+      )
   }
-
-  const hOnClickNeutral = () => {
-    const uNeutral = neutral + 1;
-    
-    setNeutral(uNeutral);
-    setAllStats(good + uNeutral + bad);
-  }
-
-  const hOnClickBad = () => {
-    const uBad= bad + 1;
-    
-    setBad(uBad);
-    setAllStats(good + neutral + uBad);
-
-    setAverage(average - 1);
-  }
-
-  const getAverage = () => average / allStats;
-  const getPositivePercent = () => (good / allStats) * 100;
 
   return (
-    
+    <div>
+      <h2>Statistics:</h2>
+      <StatisticLine text={'Good'} data={stats.good} />
+      <StatisticLine text={'Neutral'} data={stats.neutral} />
+      <StatisticLine text={'Bad'} data={stats.bad} />
 
+      <hr />
+
+      <StatisticLine text={'All Votes'} data={getAllStats()} />
+      <StatisticLine text={'Average'} data={getAverage()} />
+
+      <hr />
+
+      {getAllStats() > 0 ?
+        <StatisticLine text={'Positive Ratio'} data={getStatRatio(stats.good) + '%'} /> :
+        <StatisticLine text={'Positive Ratio'} data={'0%'} />
+      }
+
+    </div>
+    )
+}
+
+// Component < App >
+const App = () => {
+  // save clicks of each button to its own state
+  const [stats, setStats] = useState({ good: 0, neutral: 0, bad: 0 });
+  const [hasGivenFeedback, setHasGivenFeedback] = useState(false);
+
+  // Handle OnClick Fncs
+  const hOnClickGood = () => setStats({ ...stats, good: stats.good + 1 });
+  const hOnClickNeutral = () => setStats({ ...stats, neutral: stats.neutral + 1 });
+  const hOnClickBad = () => setStats({ ...stats, bad: stats.bad + 1 });
+
+  return (
     <div>
       <h2>Give Feedback! 😉</h2>
       <MyButton onClick={hOnClickGood} text={'good'} />
       <MyButton onClick={hOnClickNeutral} text={'neutral'} />
       <MyButton onClick={hOnClickBad} text={'bad'} />
-      
-      <h2>Statistics:</h2>
-      <StatisticLine text={'Good'}    data={good} />
-      <StatisticLine text={'Neutral'} data={neutral} />
-      <StatisticLine text={'Bad'}     data={bad} />
 
-      <StatisticLine text={'All Votes'} data={allStats}/>
-      <StatisticLine text={'Average'}   data={getAverage()}/>
-      <StatisticLine text={'Positive'}  data={allStats > 0 ? getPositivePercent() + '%' : '0%'}/>
-
+      <Statistics stats={stats} />
     </div>
   )
 }
