@@ -5,8 +5,8 @@ This folder contains the exercises:
 - 2.6: The Phonebook Step 1 ✔
 - 2.7: The Phonebook Step 2 ✔
 - 2.8: The Phonebook Step 3 ✔
-- 2.9*: The Phonebook Step 4
-- 2.10: The Phonebook Step 5
+- 2.9*: The Phonebook Step 4 ✔
+- 2.10: The Phonebook Step 5 ✔
 
 ## 2.6: The Phonebook Step 1
 Let's create a simple phonebook. In this part, we will only be adding names to the phonebook.
