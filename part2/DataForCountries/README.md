@@ -2,8 +2,8 @@
 
 This folder contains the exercises:
 
-- 2.18* Data for countries, step 1
-- 2.19*: Data for countries, step 2
+- 2.18* Data for countries, step 1 ✔
+- 2.19*: Data for countries, step 2 ✔
 - 2.20*: Data for countries, step 3
 
 ## 2.18* Data for countries, step 1
@@ -29,6 +29,9 @@ Improve on the application in the previous exercise, such that when the names of
 In this exercise, it is also enough that your application works for most countries. Countries whose name appears in the name of another country, like Sudan, can be ignored.
 
 ## 2.20*: Data for countries, step 3
+
+    I'm not finishing this last step about the weather since I have to introduce 
+    my credit card data and I refuse to do that for a learning, non mandatory, exercise
 
 Add to the view showing the data of a single country, the weather report for the capital of that country. There are dozens of providers for weather data. One suggested API is https://openweathermap.org. Note that it might take some minutes until a generated API key is valid.
 
