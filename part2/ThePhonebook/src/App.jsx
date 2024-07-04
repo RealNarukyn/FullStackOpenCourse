@@ -59,9 +59,9 @@ const PersonDetails = ({ name, number, id, deletePerson }) => {
 
       deletePerson(id);
     })
-    .catch(error => {
-      console.log('Error is:', error);
-    });
+      .catch(error => {
+        console.log('Error is:', error);
+      });
   }
 
   return (
@@ -75,6 +75,14 @@ const PersonDetails = ({ name, number, id, deletePerson }) => {
 }
 
 const MyList = ({ title, data, filter, deletePerson }) => {
+  if (!data.length)
+  {
+    return (
+      <p>No data to show...</p>
+    )
+  }
+    
+
   return (
     <div>
       <h2>{title}</h2>

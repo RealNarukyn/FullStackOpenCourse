@@ -1,11 +1,11 @@
-const express = require('express');
-const morgan = require('morgan');
+const express   = require('express');
+const morgan    = require('morgan');
+const cors      = require('cors');
+// const path      = require('path');
 
 const app = express();
 
 // * Defines
-const PORT = 3001;
-const URL = `http://localhost:${PORT}`;
 
 // * Database ( fake )
 let PERSONS = [
@@ -33,8 +33,9 @@ let PERSONS = [
 
 
 // * Middlewares
+app.use(express.static('dist'));
+app.use(cors());
 app.use(express.json());
-
 
 morgan.token('body', (req) => JSON.stringify(req.body));
 
@@ -69,20 +70,24 @@ const generateRandID = () => Math.floor(Math.random() * 10_000);
 
 
 // * [ GET ] Routing
-app.get('/', (request, response) => {
-    const INDEX_HTML =
-        `
-            <h1>The Phonebook backend service</h1>
-            <p>Please make the right calls to:</p>
-            <ul>
-                <li><a href="${URL}/api/persons">/api/persons</a></li>
-                <li><a href="${URL}/api/persons/info">/api/persons/info</a></li>
-                <li>/api/person/[id]</li>
-            </ul>
-        `;
+// app.get('/', (request, response) => {
+//     const INDEX_HTML =
+//         `
+//             <h1>The Phonebook backend service</h1>
+//             <p>Please make the right calls to:</p>
+//             <ul>
+//                 <li><a href="${URL}/api/persons">/api/persons</a></li>
+//                 <li><a href="${URL}/api/persons/info">/api/persons/info</a></li>
+//                 <li>/api/person/[id]</li>
+//             </ul>
+//         `;
 
-    response.send(INDEX_HTML);
-})
+//     response.send(INDEX_HTML);
+// })
+
+// app.get('/', (request, response) => {
+//     response.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// })
 
 app.get('/api/persons', (request, response) => {
     response.json(PERSONS);
@@ -154,4 +159,5 @@ app.delete('/api/persons/:id', (request, response) => {
 
 
 // * APP Listening...
-app.listen(PORT, () => console.log(`Server listening at: ${URL}`));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server listening at PORT: ${PORT}`));

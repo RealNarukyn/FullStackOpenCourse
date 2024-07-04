@@ -1,6 +1,14 @@
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:3001/persons'
+/**
+ * To use the JSON-Server we need to wake it up with:
+ *      npm run server
+ * this will set the local server at:
+ *      http://localhost:3001/persons
+ */
+//const BASE_URL = 'http://localhost:3001/persons'        // Works for: JSON-SERVER DB
+
+const BASE_URL = '/api/persons'                           // Works for: our backend in part3 
 
 const getAllPeople = () => axios.get(BASE_URL);
 

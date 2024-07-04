@@ -1,15 +1,20 @@
-# The Phonebook Backend Exercise
+# [The Phonebook Backend Exercise](https://thephonebook-white-surf-4069.fly.dev/api/persons)
+
+__In case the link in the title does not work it's: https://thephonebook-white-surf-4069.fly.dev/api/persons__
 
 This folder contains the exercises:
 
-- 3.1: The Phonebook Step 1 ✔ (15min)
-- 3.2: The Phonebook Step 2 ✔ (10 min)
-- 3.3: The Phonebook Step 3 ✔ (5 min)
-- 3.4: The Phonebook Step 4 ✔ (5 min)
-- 3.5: The Phonebook Step 5 ✔ (10 min)
-- 3.6: The Phonebook Step 6 ✔ (5 min)
-- 3.7: The Phonebook Step 6 ✔ (5 min)
-- 3.8: The Phonebook Step 6 ✔ (15 min)
+- 3.1: The Phonebook Step 1     ✔ (15min)
+- 3.2: The Phonebook Step 2     ✔ (10 min)
+- 3.3: The Phonebook Step 3     ✔ (5 min)
+- 3.4: The Phonebook Step 4     ✔ (5 min)
+- 3.5: The Phonebook Step 5     ✔ (10 min)
+- 3.6: The Phonebook Step 6     ✔ (5 min)
+- 3.7: The Phonebook Step 7     ✔ (5 min)
+- 3.8: The Phonebook Step 8     ✔ (15 min)
+- 3.9: The Phonebook Step 9     ✔ (5 min)
+- 3.10: The Phonebook Step 10   ✔ (30 min)
+- 3.11: The Phonebook Step 11   ✔ (1:30 min)
 
 
 ## 3.1: Phonebook backend step 1
@@ -110,3 +115,87 @@ This exercise can be completed in a few different ways. One of the possible solu
 
 - creating new tokens
 - JSON.stringify
+
+## 3.9 Phonebook backend step 9
+
+Make the backend work with the phonebook frontend from the exercises of the previous part. Do not implement the functionality for making changes to the phone numbers yet, that will be implemented in exercise 3.17.
+
+You will probably have to do some small changes to the frontend, at least to the URLs for the backend. Remember to keep the developer console open in your browser. If some HTTP requests fail, you should check from the Network-tab what is going on. Keep an eye on the backend's console as well. If you did not do the previous exercise, it is worth it to print the request data or request.body to the console in the event handler responsible for POST requests.
+
+## 3.10 Phonebook backend step 10
+
+Deploy the backend to the internet, for example to Fly.io or Render.
+
+Test the deployed backend with a browser and Postman or VS Code REST client to ensure it works.
+
+PRO TIP: When you deploy your application to Internet, it is worth it to at least in the beginning keep an eye on the logs of the application AT ALL TIMES.
+
+Create a README.md at the root of your repository, and add a link to your online application to it.
+
+NOTE: as it was said, you should deploy the BACKEND to the cloud service. If you are using Fly.io the commands should be run in the root directory of the backend (that is, in the same directory where the backend package.json is). In case of using Render, the backend must be in the root of your repository.
+
+You shall NOT be deploying the frontend directly at any stage of this part. It is just backend repository that is deployed throughout the whole part, nothing else.
+
+## 3.11 Full Stack Phonebook
+
+```
+Using 'Fly' remove the dist from .dockerignore and .gitignore when doing 'fly deploy'. Otherwise the docker container won't push the dist directory and won't load the index.html
+```
+
+Generate a production build of your frontend, and add it to the Internet application using the method introduced in this part.
+
+NB If you use Render, make sure the directory dist is not ignored by git on the backend.
+
+Also, make sure that the frontend still works locally (in development mode when started with command npm run dev).
+
+If you have problems getting the app working make sure that your directory structure matches the example app.
+
+
+## To deploy in fly:
+
+Start by authenticating via the command line with the command
+
+```bash
+fly auth login
+```
+
+Initializing an app happens by running the following command in the root directory of the app
+
+```bash
+fly launch --no-deploy
+```
+
+Give the app a name or let Fly.io auto-generate one. Pick a region where the app will be run.
+
+Fly.io creates a file fly.toml in the root of your app where we can configure it. To get the app up and running we might need to do a small addition to the configuration:
+
+```
+[build]
+
+[env]
+  PORT = "3000" # add this
+
+[http_service]
+  internal_port = 3000 # ensure that this is same as PORT
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+```
+
+We are now ready to deploy the app to the Fly.io servers. That is done with the following command:
+
+```bash
+fly deploy
+```
+
+**Note**: Fly may create 2 machines for your app, if it does then the state of the data in your app will be inconsistent between requests, i.e. you would have two machines each with its own notes variable, you could POST to one machine then your next GET could go to another machine. 
+
+You can check the number of machines by using the command "$ fly scale show", if the COUNT is greater than 1 then you can enforce it to be 1 with the command 
+
+``` bash 
+fly scale count 1
+```
+
+The machine count can also be checked on the dashboard.
