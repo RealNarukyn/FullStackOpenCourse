@@ -1,36 +1,12 @@
+require('dotenv').config()
+
 const express   = require('express');
 const morgan    = require('morgan');
 const cors      = require('cors');
+const Person    = require('./models/persons.model');
 // const path      = require('path');
 
 const app = express();
-
-// * Defines
-
-// * Database ( fake )
-let PERSONS = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
-
 
 // * Middlewares
 app.use(express.static('dist'));
@@ -60,61 +36,43 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ')
 }));
 
-// * My Functions
-const generateID = () => {
-    const persons = PERSONS.sort((a, b) => b.id - a.id);
-    return parseInt(persons[0].id) + 1;
-}
-
-const generateRandID = () => Math.floor(Math.random() * 10_000);
-
 
 // * [ GET ] Routing
-// app.get('/', (request, response) => {
-//     const INDEX_HTML =
-//         `
-//             <h1>The Phonebook backend service</h1>
-//             <p>Please make the right calls to:</p>
-//             <ul>
-//                 <li><a href="${URL}/api/persons">/api/persons</a></li>
-//                 <li><a href="${URL}/api/persons/info">/api/persons/info</a></li>
-//                 <li>/api/person/[id]</li>
-//             </ul>
-//         `;
-
-//     response.send(INDEX_HTML);
-// })
-
-// app.get('/', (request, response) => {
-//     response.sendFile(path.join(__dirname, 'dist', 'index.html'));
-// })
 
 app.get('/api/persons', (request, response) => {
-    response.json(PERSONS);
+    Person.find({})
+        .then(res => response.json(res))
+        .catch(err => response.json({ error: err }));
 })
 
 app.get('/api/persons/info', (request, response) => {
-    const entryNums = PERSONS.length;
-    const entryTimestamp = new Date().toString();
+    Person.find({})
+        .then(res => {
+            const entryNums = res.length;
+            const entryTimestamp = new Date().toString();
 
-    const RESPONSE_HTML =
-        `
-            <p>Phonebook has info for: ${entryNums} people</p>
-            <p>${entryTimestamp}</p>
-        `;
+            const RESPONSE_HTML =
+                `
+                    <p>Phonebook has info for: ${entryNums} people</p>
+                    <p>${entryTimestamp}</p>
+                `;
 
-    response.send(RESPONSE_HTML);
+            response.send(RESPONSE_HTML);
+        })
+        .catch(err => response.json({ error: err }));
 })
 
 app.get('/api/persons/:id', (request, response) => {
     const { id } = request.params;
 
-    const person = PERSONS.find(p => p.id == id);
+    Person.findById(id)
+        .then(res => {
+            if (!res)
+                return response.status(404).json({ error: 'Content Missing' });
 
-    if (!person)
-        return response.status(404).json({ error: 'Content Missing' });
-
-    response.json(person);
+            response.json(res);
+        })
+        .catch(err => response.json({ error: err }));
 });
 
 
@@ -130,20 +88,18 @@ app.post('/api/persons', (request, response) => {
         return response.status(409).json({ error: 'number must be filled' });
     }
 
-    if (PERSONS.find(p => p.name == name)) {
-        return response.status(409).json({ error: 'name must be unique' });
-    }
+    Person.find({ name })
+        .then(res => {
+            if (res.length > 0)
+                return response.status(500).json({ error: 'name must be unique' });
 
+            const newPerson = new Person({ name, number });
 
-    const newPerson = {
-        id: generateRandID(),
-        name,
-        number
-    };
-
-    PERSONS.push(newPerson);
-
-    response.status(201).json(newPerson);
+            newPerson.save()
+                .then(p => response.status(201).json(p))
+                .catch(err => response.status(500).json({ error: err }));
+        })
+        .catch(err => response.status(500).json({ error: err }));
 });
 
 
@@ -159,5 +115,5 @@ app.delete('/api/persons/:id', (request, response) => {
 
 
 // * APP Listening...
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server listening at PORT: ${PORT}`));
