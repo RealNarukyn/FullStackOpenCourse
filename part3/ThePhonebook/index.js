@@ -1,9 +1,9 @@
 require('dotenv').config()
 
-const express   = require('express');
-const morgan    = require('morgan');
-const cors      = require('cors');
-const Person    = require('./models/persons.model');
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
+const Person = require('./models/persons.model');
 // const path      = require('path');
 
 const app = express();
@@ -37,15 +37,32 @@ app.use(morgan((tokens, req, res) => {
 }));
 
 
+const errorHandler = (error, request, response, next) => {
+    console.log('Error Name:', error.name);
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' });
+    }
+
+    return response.status(500).send({ error: 'invalid request' });
+
+    next(error);
+}
+
+
 // * [ GET ] Routing
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     Person.find({})
-        .then(res => response.json(res))
-        .catch(err => response.json({ error: err }));
+        .then(res => {
+            console.log(res);
+            return response.json(res);
+        })
+        // .catch(err => response.status(500).json({ error: err }));
+        .catch(err => next(err));
 })
 
-app.get('/api/persons/info', (request, response) => {
+app.get('/api/persons/info', (request, response, next) => {
     Person.find({})
         .then(res => {
             const entryNums = res.length;
@@ -59,60 +76,80 @@ app.get('/api/persons/info', (request, response) => {
 
             response.send(RESPONSE_HTML);
         })
-        .catch(err => response.json({ error: err }));
+        //.catch(err => response.json({ error: err }));
+        .catch(err => next(err));
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const { id } = request.params;
 
     Person.findById(id)
         .then(res => {
-            if (!res)
-                return response.status(404).json({ error: 'Content Missing' });
+            if (!res) {
+                return next(res);
+            }
 
             response.json(res);
         })
-        .catch(err => response.json({ error: err }));
+        .catch(err => next(err));
 });
 
 
 // * [ POST ] Routing
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const { name, number } = request.body;
 
     if (!name.trim()) {
-        return response.status(409).json({ error: 'name must be filled' });
+        next({ name: 'malformatted name', message: 'name must be filled' });
+        //return response.status(409).json({ error: 'name must be filled' });
     }
 
     if (!number.trim()) {
-        return response.status(409).json({ error: 'number must be filled' });
+        next({ name: 'malformatted number', message: 'number must be filled' });
+        //return response.status(409).json({ error: 'number must be filled' });
     }
 
     Person.find({ name })
         .then(res => {
-            if (res.length > 0)
-                return response.status(500).json({ error: 'name must be unique' });
+            if (res.length > 0) {
+                return next ({ name: 'existing name', message: 'name must be unique' });
+            }
 
             const newPerson = new Person({ name, number });
 
             newPerson.save()
                 .then(p => response.status(201).json(p))
-                .catch(err => response.status(500).json({ error: err }));
+                .catch(err => next(err));
         })
-        .catch(err => response.status(500).json({ error: err }));
+        .catch(err => next(err));
 });
+
+// * [ PUT ] Routing
+app.put('/api/persons/:id', (request, response, next) => {
+    const { id } = request.params;
+    const { number } =  request.body;
+
+    // the optional { new: true } parameter, 
+    // will cause our event handler to be called with 
+    // the new modified document instead of the original.
+    Person.findByIdAndUpdate(id, { number }, { new: true })
+        .then(res => response.status(200).json(res))
+        .catch(err => next(err));
+})
 
 
 // * [ DELETE ] Routing
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const { id } = request.params;
 
-    PERSONS = PERSONS.filter(p => p.id != id);
-
-    response.status(204).end();
+    Person.findByIdAndDelete(id)
+        .then(res => response.status(204).end())
+        .catch(err => next(err));
 });
 
 
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler);
 
 // * APP Listening...
 const PORT = process.env.PORT || 3000;

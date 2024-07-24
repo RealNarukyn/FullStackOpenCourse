@@ -1,13 +1,17 @@
+### Get All
 GET http://localhost:3000/api/persons
 
-### 
+### Get By ID
 GET http://localhost:3000/api/persons/66955b35e871949a23422bf9
 
-### 
+### Get By ID (error)
+GET http://localhost:3000/api/persons/2
+
+### Get /info
 GET http://localhost:3000/api/persons/info
 
-###
+### Get All (web)
 GET https://thephonebook-white-surf-4069.fly.dev
 
-###
-GET https://thephonebook-white-surf-4069.fly.dev/api/persons/1
+### Get By ID (web)
+GET https://thephonebook-white-surf-4069.fly.dev/api/persons/66955b35e871949a23422bf9

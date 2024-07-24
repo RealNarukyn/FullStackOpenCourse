@@ -1,6 +1,6 @@
 # Dedicated time to:
 
-## Part 01: Introduction to React
+## Part 03:
 
 | Step  		  |  Time(hours) |
 |  ---  		  |  ---    |
@@ -9,5 +9,6 @@
 |   3.9 - 3.11    |   2.10h |
 |   3.12    	  |   0.30h |
 |   3.13 - 3.14   |   0.30h |
+|   3.15 - 3.18   |   1.30h |
 
-| TOTAL			  |   4.30h |
+| TOTAL			  |   6.00h |
