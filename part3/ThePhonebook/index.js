@@ -1,158 +1,148 @@
 require('dotenv').config()
 
-const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
-const Person = require('./models/persons.model');
-// const path      = require('path');
+const express = require('express')
+const morgan = require('morgan')
+const cors = require('cors')
+const Person = require('./models/persons.model')
+// const path      = require('path')
 
-const app = express();
+const app = express()
 
 // * Middlewares
-app.use(express.static('dist'));
-app.use(cors());
-app.use(express.json());
+app.use(express.static('dist'))
+app.use(cors())
+app.use(express.json())
 
-morgan.token('body', (req) => JSON.stringify(req.body));
+morgan.token('body', (req) => JSON.stringify(req.body))
 
 app.use(morgan((tokens, req, res) => {
-    if (req.method == 'POST') {
-        return [
-            tokens.method(req, res),
-            tokens.url(req, res),
-            tokens.status(req, res),
-            tokens.res(req, res, 'content-length'), '-',
-            tokens['response-time'](req, res), 'ms',
-            tokens['body'](req, res)
-        ].join(' ')
-    }
-
+  if (req.method === 'POST') {
     return [
-        tokens.method(req, res),
-        tokens.url(req, res),
-        tokens.status(req, res),
-        tokens.res(req, res, 'content-length'), '-',
-        tokens['response-time'](req, res), 'ms'
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, 'content-length'), '-',
+      tokens['response-time'](req, res), 'ms',
+      tokens['body'](req, res)
     ].join(' ')
-}));
+  }
+
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
+}))
 
 
-const errorHandler = (error, request, response, next) => {
-    console.log('Error Name:', error.name);
+const errorHandler = (error, request, response) => {
+  console.log('Error Name:', error.name)
 
-    if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' });
-    }
-    else if (error.name === 'ValidationError') {
-        return response.status(400).json({ error: error.message })
-    }
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
-    return response.status(500).send({ error: error.message || 'invalid request' });
-    // next(error);
+  return response.status(500).send({ error: error.message || 'invalid request' })
+  // next(error)
 }
 
 
 // * [ GET ] Routing
 
 app.get('/api/persons', (request, response, next) => {
-    Person.find({})
-        .then(res => {
-            console.log(res);
-            return response.json(res);
-        })
-        // .catch(err => response.status(500).json({ error: err }));
-        .catch(err => next(err));
+  Person.find({})
+    .then(res => {
+      console.log(res)
+      return response.json(res)
+    })
+  // .catch(err => response.status(500).json({ error: err }))
+    .catch(err => next(err))
 })
 
 app.get('/api/persons/info', (request, response, next) => {
-    Person.find({})
-        .then(res => {
-            const entryNums = res.length;
-            const entryTimestamp = new Date().toString();
+  Person.find({})
+    .then(res => {
+      const entryNums = res.length
+      const entryTimestamp = new Date().toString()
 
-            const RESPONSE_HTML =
+      const RESPONSE_HTML =
                 `
                     <p>Phonebook has info for: ${entryNums} people</p>
                     <p>${entryTimestamp}</p>
-                `;
+                `
 
-            response.send(RESPONSE_HTML);
-        })
-        //.catch(err => response.json({ error: err }));
-        .catch(err => next(err));
+      response.send(RESPONSE_HTML)
+    })
+  //.catch(err => response.json({ error: err }))
+    .catch(err => next(err))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    const { id } = request.params;
+  const { id } = request.params
 
-    Person.findById(id)
-        .then(res => {
-            if (!res) {
-                return next(res);
-            }
+  Person.findById(id)
+    .then(res => {
+      if (!res) {
+        return next(res)
+      }
 
-            response.json(res);
-        })
-        .catch(err => next(err));
-});
+      response.json(res)
+    })
+    .catch(err => next(err))
+})
 
 
 // * [ POST ] Routing
 app.post('/api/persons', (request, response, next) => {
-    const { name, number } = request.body;
+  const { name, number } = request.body
 
-    // if (!name.trim()) {
-    //     next({ name: 'malformatted name', message: 'name must be filled' });
-    //     //return response.status(409).json({ error: 'name must be filled' });
-    // }
+  Person.find({ name })
+    .then(res => {
+      if (res.length > 0) {
+        return next({ name: 'existing name', message: 'name must be unique' })
+      }
 
-    // if (!number.trim()) {
-    //     next({ name: 'malformatted number', message: 'number must be filled' });
-    //     //return response.status(409).json({ error: 'number must be filled' });
-    // }
+      const newPerson = new Person({ name, number })
 
-    Person.find({ name })
-        .then(res => {
-            if (res.length > 0) {
-                return next({ name: 'existing name', message: 'name must be unique' });
-            }
-
-            const newPerson = new Person({ name, number });
-
-            newPerson.save()
-                .then(p => response.status(201).json(p))
-                .catch(err => next(err));
-        })
-        .catch(err => next(err));
-});
+      newPerson.save()
+        .then(p => response.status(201).json(p))
+        .catch(err => next(err))
+    })
+    .catch(err => next(err))
+})
 
 // * [ PUT ] Routing
 app.put('/api/persons/:id', (request, response, next) => {
-    const { id } = request.params;
-    const { number } = request.body;
+  const { id } = request.params
+  const { number } = request.body
 
-    // the optional { new: true } parameter, 
-    // will cause our event handler to be called with 
-    // the new modified document instead of the original.
-    Person.findByIdAndUpdate(id, { number }, { new: true, runValidators: true, context: 'query' })
-        .then(res => response.status(200).json(res))
-        .catch(err => next(err));
+  // the optional { new: true } parameter,
+  // will cause our event handler to be called with
+  // the new modified document instead of the original.
+  Person.findByIdAndUpdate(id, { number }, { new: true, runValidators: true, context: 'query' })
+    .then(res => response.status(200).json(res))
+    .catch(err => next(err))
 })
 
 
 // * [ DELETE ] Routing
 app.delete('/api/persons/:id', (request, response, next) => {
-    const { id } = request.params;
+  const { id } = request.params
 
-    Person.findByIdAndDelete(id)
-        .then(res => response.status(204).end())
-        .catch(err => next(err));
-});
+  Person.findByIdAndDelete(id)
+    .then(() => response.status(204).end())
+    .catch(err => next(err))
+})
 
 
 // this has to be the last loaded middleware, also all the routes should be registered before this!
-app.use(errorHandler);
+app.use(errorHandler)
 
 // * APP Listening...
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening at PORT: ${PORT}`));
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => console.log(`Server listening at PORT: ${PORT}`))

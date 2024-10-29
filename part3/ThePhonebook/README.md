@@ -187,6 +187,36 @@ Verify that the frontend works after making your changes.
 ## 3.18*: Phonebook database step 6
 Also update the handling of the api/persons/:id and info routes to use the database, and verify that they work directly with the browser, Postman, or VS Code REST client.
 
+## 3.19*: Phonebook database, step 7
+Expand the validation so that the name stored in the database has to be at least three characters long.
+
+Expand the frontend so that it displays some form of error message when a validation error occurs.
+
+## 3.20*: Phonebook database, step 8
+Add validation to your phonebook application, which will make sure that phone numbers are of the correct form. A phone number must:
+
+have length of 8 or more
+be formed of two parts that are separated by -, the first part has two or three numbers and the second part also consists of numbers
+
+eg. 09-1234556 and 040-22334455 are valid phone numbers
+eg. 1234556, 1-22334455 and 10-22-334455 are invalid
+Use a Custom validator to implement the second part of the validation.
+
+If an HTTP POST request tries to add a person with an invalid phone number, the server should respond with an appropriate status code and error message.
+
+## 3.21 Deploying the database backend to production
+Generate a new "full stack" version of the application by creating a new production build of the frontend, and copying it to the backend repository. Verify that everything works locally by using the entire application from the address http://localhost:3001/.
+
+Push the latest version to Fly.io/Render and verify that everything works there as well.
+
+NOTE: you should deploy the BACKEND to the cloud service. If you are using Fly.io the commands should be run in the root directory of the backend (that is, in the same directory where the backend package.json is). In case of using Render, the backend must be in the root of your repository.
+
+You shall NOT be deploying the frontend directly at any stage of this part. It is just backend repository that is deployed throughout the whole part, nothing else.
+
+## 3.22: Lint configuration
+Add ESlint to your application and fix all the warnings.
+
+This was the last exercise of this part of the course. It's time to push your code to GitHub and mark all of your finished exercises to the exercise submission system.
 
 ___
 # 🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟🌟
