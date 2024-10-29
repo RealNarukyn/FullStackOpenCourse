@@ -10,6 +10,9 @@ primary_region = 'mad'
 
 [env]
   PORT = 3000
+  MONGODB_URL = 'mongodb+srv://narukyn:uwg4YJFx9iernxlV@phonebook.q3p0qbx.mongodb.net/?retryWrites=true&w=majority&appName=PhoneBook'
+
+
 
 [http_service]
   internal_port = 3000

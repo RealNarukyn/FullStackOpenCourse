@@ -75,13 +75,12 @@ const PersonDetails = ({ name, number, id, deletePerson }) => {
 }
 
 const MyList = ({ title, data, filter, deletePerson }) => {
-  if (!data.length)
-  {
+  if (!data.length) {
     return (
       <p>No data to show...</p>
     )
   }
-    
+
 
   return (
     <div>
@@ -158,7 +157,13 @@ const App = () => {
             .then(res => setPersons(res.data))
         })
         .catch(error => {
-          setNotification({ type: 'error', msg: `Information of ${PersonFound.name} has already been removed from server` })
+          if (error.response.data.error) {
+            setNotification({ type: 'error', msg: error.response.data.error })
+          }
+          else {
+            setNotification({ type: 'error', msg: error.message })
+          }
+          
           setTimerToResetNotification();
         });
 
@@ -180,7 +185,15 @@ const App = () => {
         setTimerToResetNotification();
       })
       .catch(error => {
-        setNotification({ type: 'error', msg: `Unrecognized error creating new contact...` })
+        // setNotification({ type: 'error', msg: `Unrecognized error creating new contact...` })
+        console.log('error is:', error);
+        if (error.response.data.error) {
+          setNotification({ type: 'error', msg: error.response.data.error })
+        }
+        else {
+          setNotification({ type: 'error', msg: error.message })
+        }
+
         setTimerToResetNotification();
       });
   }

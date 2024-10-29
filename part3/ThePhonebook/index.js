@@ -43,10 +43,12 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' });
     }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
+    }
 
-    return response.status(500).send({ error: 'invalid request' });
-
-    next(error);
+    return response.status(500).send({ error: error.message || 'invalid request' });
+    // next(error);
 }
 
 
@@ -99,20 +101,20 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     const { name, number } = request.body;
 
-    if (!name.trim()) {
-        next({ name: 'malformatted name', message: 'name must be filled' });
-        //return response.status(409).json({ error: 'name must be filled' });
-    }
+    // if (!name.trim()) {
+    //     next({ name: 'malformatted name', message: 'name must be filled' });
+    //     //return response.status(409).json({ error: 'name must be filled' });
+    // }
 
-    if (!number.trim()) {
-        next({ name: 'malformatted number', message: 'number must be filled' });
-        //return response.status(409).json({ error: 'number must be filled' });
-    }
+    // if (!number.trim()) {
+    //     next({ name: 'malformatted number', message: 'number must be filled' });
+    //     //return response.status(409).json({ error: 'number must be filled' });
+    // }
 
     Person.find({ name })
         .then(res => {
             if (res.length > 0) {
-                return next ({ name: 'existing name', message: 'name must be unique' });
+                return next({ name: 'existing name', message: 'name must be unique' });
             }
 
             const newPerson = new Person({ name, number });
@@ -127,12 +129,12 @@ app.post('/api/persons', (request, response, next) => {
 // * [ PUT ] Routing
 app.put('/api/persons/:id', (request, response, next) => {
     const { id } = request.params;
-    const { number } =  request.body;
+    const { number } = request.body;
 
     // the optional { new: true } parameter, 
     // will cause our event handler to be called with 
     // the new modified document instead of the original.
-    Person.findByIdAndUpdate(id, { number }, { new: true })
+    Person.findByIdAndUpdate(id, { number }, { new: true, runValidators: true, context: 'query' })
         .then(res => response.status(200).json(res))
         .catch(err => next(err));
 })
