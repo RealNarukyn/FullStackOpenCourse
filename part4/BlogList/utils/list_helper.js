@@ -1,4 +1,7 @@
-const dummy = blogs => {
+const _ = require('lodash')
+
+// const dummy = blogs => {       // Commented cause of eslint
+const dummy = () => {
   return 1
 }
 
@@ -21,11 +24,37 @@ const favoriteBlog = blogs => {
   }
 }
 
-// TODO: 4.6*: Helper Functions and Unit Tests, step 4
-const mostBlogs = () => {}
+// 4.6*: Helper Functions and Unit Tests, step 4
+const mostBlogs = (blogs) => {
 
-// TODO: 4.7*: Helper Functions and Unit Tests, step 5
-const mostLikes = () => {}
+  // Creates an object where each key is an author, and
+  // each value is the count of blogs by that author.
+  const blogsByAuthor = _.countBy(blogs, 'author')
+
+  // Finds the author with the maximum blog count.
+  const maxAuthor = _.maxBy(_.keys(blogsByAuthor), (author) => blogsByAuthor[author])
+
+  return {
+    author: maxAuthor,
+    blogs: blogsByAuthor[maxAuthor],
+  }
+}
+
+// 4.7*: Helper Functions and Unit Tests, step 5
+const mostLikes = (blogs) => {
+  const likesByAuthor = _(blogs)
+    .groupBy('author')                                          // Groups the blogs by each author.
+    .mapValues((authorBlogs) => _.sumBy(authorBlogs, 'likes'))  // For each author, sum up the likes across all their blogs.
+    .value()
+
+  // Determines which author has the highest number of total likes.
+  const maxAuthor = _.maxBy(_.keys(likesByAuthor), (author) => likesByAuthor[author])
+
+  return {
+    author: maxAuthor,
+    likes: likesByAuthor[maxAuthor],
+  }
+}
 
 module.exports = {
   dummy,

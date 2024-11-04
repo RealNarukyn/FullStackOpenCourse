@@ -58,6 +58,26 @@ describe('favourite blog', () => {
   })
 })
 
-// TODO: 4.6*: Helper Functions and Unit Tests, step 4
+// 4.6*: Helper Functions and Unit Tests, step 4
+describe('top blogger', () => {
+  test('get blogger with most blogs', () => {
+    const blog = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(blog,
+      {
+        author: 'Robert C. Martin',
+        blogs: 3
+      })
+  })
+})
 
-// TODO: 4.7*: Helper Functions and Unit Tests, step 5
+// 4.7*: Helper Functions and Unit Tests, step 5
+describe('most liked blogger', () => {
+  test('get blogger with most likes', () => {
+    const blog = listHelper.mostLikes(blogs)
+    assert.deepStrictEqual(blog,
+      {
+        author: 'Edsger W. Dijkstra',
+        likes: 17
+      })
+  })
+})
